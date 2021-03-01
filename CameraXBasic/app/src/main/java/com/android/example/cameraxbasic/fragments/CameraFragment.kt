@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.util.Log
+import android.util.Size
 import android.view.*
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -11,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.android.example.cameraxbasic.R
+import com.android.example.cameraxbasic.fragments.camera.CameraInfoCalculator
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -29,11 +31,12 @@ class CameraFragment : Fragment(), TextureView.SurfaceTextureListener {
     private lateinit var container: ConstraintLayout
 
     private lateinit var textureView: TextureView
-    private lateinit var surface: Surface
 
     private var preview: Preview? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
+
+    private lateinit var surfaceTexture: SurfaceTexture
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -95,11 +98,12 @@ class CameraFragment : Fragment(), TextureView.SurfaceTextureListener {
 
         // Preview
         preview = Preview.Builder()
-                // We request aspect ratio but no resolution
-                .setTargetAspectRatio(screenAspectRatio)
-                // Set initial target rotation
-                .setTargetRotation(rotation)
-                .build()
+            // We request aspect ratio but no resolution
+            .setTargetAspectRatio(screenAspectRatio)
+            // Set initial target rotation
+            .setTargetRotation(rotation)
+  //          .setTargetResolution(Size(textureView.width, textureView.height))
+            .build()
 
         // Must unbind the use-cases before rebinding them
         cameraProvider.unbindAll()
@@ -111,7 +115,10 @@ class CameraFragment : Fragment(), TextureView.SurfaceTextureListener {
 
             // Attach the viewfinder's surface provider to preview use case
             //preview?.setSurfaceProvider(viewFinder.surfaceProvider)
-            preview?.setSurfaceProvider(PreviewSurfaceProvider(surface, cameraExecutor))
+
+            val cameraInfo = CameraInfoCalculator.calculateCameraInfo(requireContext())
+
+            preview?.setSurfaceProvider(PreviewSurfaceProvider(surfaceTexture, cameraInfo.optimalOutputSize, cameraExecutor))
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
@@ -129,10 +136,15 @@ class CameraFragment : Fragment(), TextureView.SurfaceTextureListener {
      *  @return suitable aspect ratio
      */
     private fun aspectRatio(width: Int, height: Int): Int {
+        Log.d("textureSize", "aspectRatio: $width; $height")
+
         val previewRatio = max(width, height).toDouble() / min(width, height)
         if (abs(previewRatio - RATIO_4_3_VALUE) <= abs(previewRatio - RATIO_16_9_VALUE)) {
+            Log.d("textureSize", "aspectRatio: RATIO_4_3")
             return AspectRatio.RATIO_4_3
         }
+        Log.d("textureSize", "aspectRatio: RATIO_16_9")
+
         return AspectRatio.RATIO_16_9
     }
 
@@ -143,13 +155,20 @@ class CameraFragment : Fragment(), TextureView.SurfaceTextureListener {
     }
 
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-        this.surface = Surface(surface)
-
-        // Set up the camera and its use cases
-        setUpCamera()
+        Log.d("textureSize", "onSurfaceTextureAvailable: $width; $height")
+//        this.surface = Surface(surface)
+//
+//        // Set up the camera and its use cases
+//        setUpCamera()
     }
 
     override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
+        Log.d("textureSize", "onSurfaceTextureSizeChanged: $width; $height")
+
+        surfaceTexture = surface
+
+        // Set up the camera and its use cases
+        setUpCamera()
     }
 
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {

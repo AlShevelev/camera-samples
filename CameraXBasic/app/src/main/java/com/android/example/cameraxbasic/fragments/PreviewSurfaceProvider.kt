@@ -1,16 +1,20 @@
 package com.android.example.cameraxbasic.fragments
 
+import android.graphics.SurfaceTexture
+import android.util.Size
 import android.view.Surface
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
 import java.util.concurrent.Executor
 
 class PreviewSurfaceProvider (
-    private val surface: Surface,
+    private val surfaceTexture: SurfaceTexture,
+    private val optimalOutputSize: Size,
     private val executor: Executor
 ): Preview.SurfaceProvider {
     override fun onSurfaceRequested(request: SurfaceRequest) {
-        request.provideSurface(surface, executor, {
+        surfaceTexture.setDefaultBufferSize(optimalOutputSize.width, optimalOutputSize.height)
+        request.provideSurface(Surface(surfaceTexture), executor, {
             // do noting
         })
     }
