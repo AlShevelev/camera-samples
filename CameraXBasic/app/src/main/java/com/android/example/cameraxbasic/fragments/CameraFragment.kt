@@ -18,9 +18,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.android.example.cameraxbasic.R
+import com.android.example.cameraxbasic.filters.FilterCode
 import com.android.example.cameraxbasic.filters.FiltersFactory
 import com.android.example.cameraxbasic.filters.filter.CameraFilter
-import com.android.example.cameraxbasic.filters.filter_settings.BlackAndWhiteFilterSettings
+import com.android.example.cameraxbasic.filters.filter_settings.EmptyFilterSettings
 import com.android.example.cameraxbasic.filters.filter_settings.FilterSettings
 import com.android.example.cameraxbasic.fragments.camera.CameraInfoCalculator
 import com.android.example.cameraxbasic.fragments.utils.TextureUtils
@@ -195,7 +196,7 @@ class CameraFragment : Fragment(), TextureView.SurfaceTextureListener {
         initGL(surfaceTexture)
 
         filtersFactory = FiltersFactory(requireContext())
-        selectedFilterSettings = BlackAndWhiteFilterSettings(isInverted = false)
+        selectedFilterSettings = EmptyFilterSettings(FilterCode.GRAY)
         selectedFilter = filtersFactory.getFilter(selectedFilterSettings.code)
         selectedFilter.onAttach(selectedFilterSettings)
 
@@ -227,7 +228,10 @@ class CameraFragment : Fragment(), TextureView.SurfaceTextureListener {
     }
 
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-        // Stop rendering
+        cameraSurfaceTexture.release()
+        GLES31.glDeleteTextures(1, intArrayOf(cameraTextureId), 0)
+
+        CameraFilter.release()
         return true
     }
 
