@@ -8,7 +8,7 @@ import androidx.annotation.RawRes
 import com.android.example.cameraxbasic.R
 import com.android.example.cameraxbasic.filters.RenderBuffer
 import com.android.example.cameraxbasic.filters.filter_settings.FilterSettings
-import com.android.example.cameraxbasic.fragments.utils.ShaderUtils
+import com.android.example.cameraxbasic.gl.ShaderUtils
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer

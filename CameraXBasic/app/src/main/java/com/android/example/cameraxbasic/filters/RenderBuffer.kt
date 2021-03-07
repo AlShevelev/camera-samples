@@ -1,7 +1,7 @@
 package com.android.example.cameraxbasic.filters
 
 import android.opengl.GLES31
-import com.android.example.cameraxbasic.fragments.utils.TextureUtils
+import com.android.example.cameraxbasic.gl.TextureUtils
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import javax.microedition.khronos.opengles.GL10

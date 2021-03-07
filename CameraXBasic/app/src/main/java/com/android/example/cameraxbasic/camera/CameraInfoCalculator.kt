@@ -1,4 +1,4 @@
-package com.android.example.cameraxbasic.fragments.camera
+package com.android.example.cameraxbasic.camera
 
 import android.content.Context
 import android.graphics.ImageFormat

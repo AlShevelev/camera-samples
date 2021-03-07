@@ -1,4 +1,4 @@
-package com.android.example.cameraxbasic.fragments.utils
+package com.android.example.cameraxbasic.gl
 
 import android.content.Context
 import android.opengl.GLES31
